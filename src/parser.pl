@@ -1,6 +1,18 @@
 :- table expr/3, expr1/3, term/3, bool_expr/3.
 :- use_rendering(svgtree).
 
+%Author:Shreya
+%Purpose:DCG for conditional expression
+%Version:1
+%Date:Nov 1,2024
+
+command((X,Y)) --> command(X),command(Y).
+command(=(X,Y)) --> id(X), [=], expr(Y),[;].
+
+% if Conditional statement 
+command(if(X,Y,Z)) --> 
+    [if], ['('], bool_expr(X), [')'], ['{'], command(Y), ['}'],[else], ['{'], command(Z), ['}'].
+    
 % Author: Jean
 % Purpose: DCG for boolean expression and arithmetic expression
 % Version: 1
