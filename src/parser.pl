@@ -14,6 +14,8 @@ command(=(X,Y)) --> id(X), [=], expr(Y),[;].
 % if Conditional statement 
 command(if(X,Y,Z)) --> 
     [if], ['('], bool_expr(X), [')'], ['{'], command(Y), ['}'],[else], ['{'], command(Z), ['}'].
+command(if(X,Y,Z)) -->
+    bool_expr(X),[?],command(Y),[:],command(Z).
 
 %Author:Reuben
 %Purpose:DCG for iteration (while loop, for loop, do while loop)
