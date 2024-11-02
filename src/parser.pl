@@ -10,6 +10,7 @@ program(program(X)) --> ['{'],command(X),['}'].
 
 command((X,Y)) --> command(X),command(Y).
 command(=(X,Y)) --> id(X), [=], expr(Y),[;].
+command(=(X,Y)) --> [const], id(X), [=], expr(Y),[;].
 
 % if Conditional statement 
 command(if(X,Y,Z)) --> 
