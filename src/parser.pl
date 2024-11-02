@@ -12,7 +12,29 @@ command(=(X,Y)) --> id(X), [=], expr(Y),[;].
 % if Conditional statement 
 command(if(X,Y,Z)) --> 
     [if], ['('], bool_expr(X), [')'], ['{'], command(Y), ['}'],[else], ['{'], command(Z), ['}'].
-    
+
+%Author:Reuben
+%Purpose:DCG for iteration (while loop, for loop, do while loop)
+%Version:1
+%Date:Nov 1,2024
+
+% Iteration Rules
+% While Loop 
+command(while(X,Y)) --> 
+    [while], ['('], bool_expr(X), [')'], ['{'], command(Y), ['}'].
+
+% For Loop
+command(for(start(=(V,W)),condition(X),update(Y,U),body(Z))) -->
+    [for],['('], id(V), [=], expr(W), [;],
+    bool_expr(X), [;],
+    id(Y), [=], expr(U),[')'],
+    ['{'],command(Z),['}'].
+
+% Do-While Loop
+command(do_while(body(Y), condition(X))) -->
+    [do], ['{'], command(Y), ['}'],
+    [while], ['('], bool_expr(X), [')'], [';'].
+
 % Author: Jean
 % Purpose: DCG for boolean expression and arithmetic expression
 % Version: 1
