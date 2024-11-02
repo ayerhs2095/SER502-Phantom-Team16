@@ -1,0 +1,4 @@
+Jean: DCG for Boolean , Arithmetic and print statement
+Shreya: DCG for if and ternary statements
+Reuben: DCG for iteration statements(for, while, do while)
+Deepanjay:Lexer
