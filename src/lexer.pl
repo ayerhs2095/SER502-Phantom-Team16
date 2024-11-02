@@ -29,16 +29,16 @@ handle_token(Input, RestT, Token) :-
     ).
 
 % Operators
-multi_char_operator(['n', 'o', 't'|T], T, 'not') :- next_non_alpha(T).
-multi_char_operator(['a', 'n', 'd'|T], T, 'and') :- next_non_alpha(T).
-multi_char_operator(['o', 'r'|T], T, 'or') :- next_non_alpha(T).
+multi_char_operator(['n', 'o', 't'|T], T, 'not') :- next_non_alpha(T, T).
+multi_char_operator(['a', 'n', 'd'|T], T, 'and') :- next_non_alpha(T, T).
+multi_char_operator(['o', 'r'|T], T, 'or') :- next_non_alpha(T, T).
 multi_char_operator(['=', '=', H|T], RestT, '==') :- next_non_alpha([H|T], RestT).
 multi_char_operator(['>', '=', H|T], RestT, '>=') :- next_non_alpha([H|T], RestT).
 multi_char_operator(['<', '=', H|T], RestT, '<=') :- next_non_alpha([H|T], RestT).
 
 % Single character operators
 single_char_operator([H|T], T, Token) :-
-    member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '(', ')', '{', '}']),
+    member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '(', ')', '{', '}', '<', '>']),
     atom_chars(Token, [H]).
 
 % Assignment token
