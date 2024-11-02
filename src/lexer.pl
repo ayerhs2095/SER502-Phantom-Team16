@@ -1,7 +1,7 @@
 % Author: Deepanjay Nandal
 % Purpose: Transforms input text into structured tokens for parsing
 % Version: 1
-% Date: 1st November 2024
+% Date: 1st Nov, 2024
 
 lexer(Input, Tokens) :-
     string_chars(Input, Chars),
@@ -14,30 +14,24 @@ tokenize([H|T], TokenAcc, Tokens) :-
     (   char_type(H, space)
     ->  tokenize(T, TokenAcc, Tokens)  % Skip spaces
     ;   handle_token([H|T], NewT, Token)
-    ->  tokenize(NewT, [Token|TokenAcc], Tokens)  % Add new Token to the end of list
+    ->  tokenize(NewT, [Token|TokenAcc], Tokens)  % Add new Token to the list
     ;   tokenize(T, TokenAcc, Tokens)  % Skip character if no token can be formed
     ).
 
 % Handle tokens
 handle_token(Input, RestT, Token) :-
-    ( multi_char_operator(Input, RestT, Token) ->
-        true
-    ; single_char_operator(Input, RestT, Token) ->
-        true
-    ; number_token(Input, RestT, Token) ->
-        true
-    ; string_token(Input, RestT, Token) ->
-        true
-    ; identifier_or_keyword_token(Input, RestT, Token) ->
-        true
-    ; assignment_token(Input, RestT, Token) ->
-        true
+    ( multi_char_operator(Input, RestT, Token) ;
+      single_char_operator(Input, RestT, Token) ;
+      number_token(Input, RestT, Token) ;
+      string_token(Input, RestT, Token) ;
+      identifier_or_keyword_token(Input, RestT, Token) ;
+      assignment_token(Input, RestT, Token)
     ).
 
 % Operators
-multi_char_operator(['n', 'o', 't'|T], RestT, 'not') :- next_non_alpha(T, RestT).
-multi_char_operator(['a', 'n', 'd'|T], RestT, 'and') :- next_non_alpha(T, RestT).
-multi_char_operator(['o', 'r'|T], RestT, 'or') :- next_non_alpha(T, RestT).
+multi_char_operator(['n', 'o', 't'|T], T, 'not') :- next_non_alpha(T).
+multi_char_operator(['a', 'n', 'd'|T], T, 'and') :- next_non_alpha(T).
+multi_char_operator(['o', 'r'|T], T, 'or') :- next_non_alpha(T).
 multi_char_operator(['=', '=', H|T], RestT, '==') :- next_non_alpha([H|T], RestT).
 multi_char_operator(['>', '=', H|T], RestT, '>=') :- next_non_alpha([H|T], RestT).
 multi_char_operator(['<', '=', H|T], RestT, '<=') :- next_non_alpha([H|T], RestT).
@@ -51,7 +45,7 @@ single_char_operator([H|T], T, Token) :-
 assignment_token([H|T], RestT, Token) :-
     valid_identifier_start(H),
     consume_identifier_chars([H|T], IdChars, RestT1),
-    RestT1 = [ '=', ';' | RestT],  % Ensure assignment ends with '=' and requires ';'
+    RestT1 = ['=', ';'|RestT],  % Ensure assignment ends with '=' and requires ';'
     atom_chars(Identifier, IdChars),
     atom_concat(Identifier, ' = ', Temp),
     atom_concat(Temp, ';', Token).
@@ -71,9 +65,8 @@ string_token(['"'|T], RestT, Token) :-
 
 % Helper predicate for characters until the closing quote
 string_chars_token(['"'|T], '', T).
-string_chars_token([H|T], Chars, RestT) :-
-    string_chars_token(T, TailChars, RestT),
-    atom_concat(H, TailChars, Chars).
+string_chars_token([H|T], [H|TailChars], RestT) :-
+    string_chars_token(T, TailChars, RestT).
 
 % Identifiers or keywords
 identifier_or_keyword_token([H|T], RestT, Identifier) :-
@@ -96,10 +89,12 @@ consume_identifier_chars(T, [], T).
 % Identifier validation
 valid_identifier_start(H) :-
     \+ char_type(H, space),
-    \+ member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '"', '(', ')', '{', '}']).
+    \+ member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '"', '(', ')', '{', '}']),
+    ( char_type(H, alpha) ; H == '_' ).  % Allow starting with an underscore
 
+% Valid characters for identifiers: alphanumeric and underscore.
 valid_identifier_char(H) :-
-    char_type(H, alnum); H == '_'.
+    char_type(H, alnum) ; H == '_'.
 
 % Check if the next character is non-alphabetic
 next_non_alpha([], []).
