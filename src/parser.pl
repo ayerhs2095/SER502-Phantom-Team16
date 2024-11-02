@@ -45,6 +45,11 @@ command(do_while(body(Y), condition(X))) -->
 % Version: 1
 % Date: Nov 1, 2024
 
+% print statements
+command(print(X)) --> [print],['('],text(X),[')'],[;].
+text(text(X,Y)) --> id(X),text(Y).
+text(X) --> id(X).
+
 bool_expr(==(X,Y)) --> expr(X),['=='],expr(Y).
 bool_expr(<=(X,Y)) --> expr(X),['<='],expr(Y).
 bool_expr(<(X,Y)) --> expr(X),['<'],expr(Y).
