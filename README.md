@@ -8,5 +8,12 @@
 - Reuben Roy Kochukudiyil
 - Deepanjay Nandal
  
-**System supported:** Windows\
+**System supported:** Windows \
 **Tools used:** Prolog
+
+# Instructions to Run the file
+- navigate to the src folder and open the file location in prolog
+- add the program file in the same file location
+- run the following commands:
+  - consult('main.pl').
+  - run('file location').
