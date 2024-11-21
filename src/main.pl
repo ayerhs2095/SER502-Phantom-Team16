@@ -2,10 +2,10 @@
 :- include(parser).
 :- include(evaluator).
 
- open(FileLocation,read,Program),
+ run(FileLocation):-
+   read_file_to_string(FileLocation, Program, []),
    lexer(Program,Tokens),
-   program(ParseTree,Tokens),
+   program(ParseTree,Tokens,[]),
    program_eval(ParseTree,Environment),
-   close(Program),
-   write('Final Environment: '),
+   nl,write('Final Environment: '),
    write(Environment), nl.
