@@ -15,6 +15,62 @@ update([[X,V]|T],Id,Value,[[X,V]|R]):-
 update([[Id,_]|T],Id,Value,[[Id,Value]|R])
 	:- update(T,1,-1,R).
 
+ % evaluate program
+program_eval(program(Block),X,Y,Z):-
+    block_eval(Block,[],X,Y,Z).
+
+% evaluate block
+block_eval(block(DeclarationBlock,CommandBlock),Env,X,Y,Z):-
+    declaration_eval(DeclarationBlock,Env,NewEnv1),
+    update(NewEnv1,'x',X,NewEnv2),update(NewEnv2,'y',Y,NewEnv3),
+    command_eval(CommandBlock,NewEnv3,NewEnv4),
+    lookup(NewEnv4,'z',Z).
+
+% evaluate declaration
+declaration_eval(id(X),Env,NewEnv):-update(Env,X,0,NewEnv).
+declaration_eval(X=Y,Env,NewEnv):-update(Env,X,Y,NewEnv).
+declaration_eval(declare(X,Y),Env,NewEnv2):-
+    declaration_eval(X,Env,NewEnv1),
+    declaration_eval(Y,NewEnv1,NewEnv2).
+
+
+% evaluate commands
+command_eval(command(Command1,Command2),Env,NewEnv2):-
+    command_eval(Command1, Env, NewEnv1),
+    command_eval(Command2, NewEnv1, NewEnv2).
+command_eval(X=Expr,Env,NewEnv2):-
+    expr_eval(Env,Expr,Value,NewEnv1),
+    update(NewEnv1,X,Value,NewEnv2).
+
+% evaluate conditional commands
+command_eval(if(condition(BoolExpr),then(Command1),else(_)), Env, NewEnv2):-
+    boolean_expr_eval(BoolExpr,Env,NewEnv1,true),
+    command_eval(Command1,NewEnv1,NewEnv2).
+command_eval(if(condition(BoolExpr),then(_),else(Command2)), Env, NewEnv2):-
+    boolean_expr_eval(BoolExpr,Env,NewEnv1,false),
+    command_eval(Command2,NewEnv1,NewEnv2).
+
+% while loop
+command_eval(LoopStatement, Env, NewEnv3):-
+    LoopStatement=while(condition(BoolExpr),body(Command)),
+    boolean_expr_eval(BoolExpr,Env,NewEnv1,true),
+    command_eval(Command,NewEnv1,NewEnv2),
+    command_eval(LoopStatement,NewEnv2,NewEnv3).
+command_eval(LoopStatement, Env, NewEnv1):-
+    LoopStatement=while(condition(BoolExpr),body(_)),
+    boolean_expr_eval(BoolExpr,Env,NewEnv1,false).
+
+% do while loop
+command_eval(LoopStatement, Env, NewEnv3):-
+    LoopStatement=do_while(body(Command),condition(BoolExpr)),
+    command_eval(Command,NewEnv1,NewEnv2),
+    boolean_expr_eval(BoolExpr,Env,NewEnv1,true),
+    command_eval(LoopStatement,NewEnv2,NewEnv3).
+command_eval(LoopStatement, Env, NewEnv1):-
+    LoopStatement=do_while(body(Command),condition(BoolExpr)),
+    command_eval(Command,NewEnv1,NewEnv2),
+    boolean_expr_eval(BoolExpr,NewEnv1,NewEnv2,false).
+
 % evaluate boolean expression
 boolean_expr_eval(Expr1==Expr2,Env,NewEnv2,true):-
     expr_eval(Env,Expr1,Value1,NewEnv1),
