@@ -1,6 +1,9 @@
 :- table command/3, expr/3, term/3, bool_expr/3.
 :- use_rendering(svgtree).
 
+% PARSER
+
+% Program
 program(program(X)) --> ['{'],command(X),['}'].
 
 %Author:Shreya
@@ -29,7 +32,7 @@ command(while(condition(X),body(Y))) -->
     [while], ['('], bool_expr(X), [')'], ['{'], command(Y), ['}'].
 
 % For Loop
-command(for(start(=(V,W)),condition(X),update(Y,U),body(Z))) -->
+command(for(start(=(V,W)),condition(X),update(=(Y,U)),body(Z))) -->
     [for],['('], id(V), [=], expr(W), [;],
     bool_expr(X), [;],
     id(Y), [=], expr(U),[')'],
@@ -46,9 +49,8 @@ command(do_while(body(Y), condition(X))) -->
 % Date: Nov 1, 2024
 
 % print statements
-command(print(X)) --> [print],['('],text(X),[')'],[;].
-text(text(X,Y)) --> id(X),text(Y).
-text(X) --> id(X).
+command(print_str(X)) --> [print],['('],[X],[')'],[;],{string(X)}.
+command(print_var(X)) --> [print],['('],[X],[')'],[;],{atom(X)}.
 
 bool_expr(==(X,Y)) --> expr(X),['=='],expr(Y).
 bool_expr(<=(X,Y)) --> expr(X),['<='],expr(Y).
