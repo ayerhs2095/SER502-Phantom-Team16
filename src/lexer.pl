@@ -5,98 +5,63 @@
 
 lexer(Input, Tokens) :-
     string_chars(Input, Chars),
-    tokenize(Chars, [], TokensRev),
-    reverse(TokensRev, Tokens).
+    process_tokens(Chars, [], RevTokens),
+    reverse(RevTokens, Tokens).
 
-% Tokenize the character list into tokens
-tokenize([], Tokens, Tokens).
-tokenize([H|T], TokenAcc, Tokens) :-
+process_tokens([], Tokens, Tokens).
+process_tokens([H|T], Accum, Tokens) :-
     (   char_type(H, space)
-    ->  tokenize(T, TokenAcc, Tokens)  % Skip spaces
-    ;   handle_token([H|T], NewT, Token)
-    ->  tokenize(NewT, [Token|TokenAcc], Tokens)  % Add new Token to the list
-    ;   tokenize(T, TokenAcc, Tokens)  % Skip character if no token can be formed
+    ->  process_tokens(T, Accum, Tokens)
+    ;   identify_token([H|T], Remaining, Token)
+    ->  process_tokens(Remaining, [Token|Accum], Tokens)
+    ;   process_tokens(T, Accum, Tokens)
     ).
 
-% Handle tokens
-handle_token(Input, RestT, Token) :-
-    ( multi_char_operator(Input, RestT, Token) ;
-      single_char_operator(Input, RestT, Token) ;
-      number_token(Input, RestT, Token) ;
-      string_token(Input, RestT, Token) ;
-      identifier_or_keyword_token(Input, RestT, Token) ;
-      assignment_token(Input, RestT, Token)
+identify_token(Input, Remaining, Token) :-
+    (   multi_char_op(Input, Remaining, Token)
+    ;   single_char_op(Input, Remaining, Token)
+    ;   string_literal(Input, Remaining, Token)
+    ;   numeric_token(Input, Remaining, Token)
+    ;   keyword_or_id(Input, Remaining, Token)
     ).
 
-% Operators
-multi_char_operator(['n', 'o', 't'|T], T, 'not') :- next_non_alpha(T, T).
-multi_char_operator(['a', 'n', 'd'|T], T, 'and') :- next_non_alpha(T, T).
-multi_char_operator(['o', 'r'|T], T, 'or') :- next_non_alpha(T, T).
-multi_char_operator(['=', '=', H|T], RestT, '==') :- next_non_alpha([H|T], RestT).
-multi_char_operator(['>', '=', H|T], RestT, '>=') :- next_non_alpha([H|T], RestT).
-multi_char_operator(['<', '=', H|T], RestT, '<=') :- next_non_alpha([H|T], RestT).
+multi_char_op(['=', '=', H|T], [H|T], '==').
+multi_char_op(['>', '=', H|T], [H|T], '>=').
+multi_char_op(['<', '=', H|T], [H|T], '<=').
+multi_char_op(['!', '=', H|T], [H|T], '!=').
 
-% Single character operators
-single_char_operator([H|T], T, Token) :-
-    member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '(', ')', '{', '}', '<', '>']),
+single_char_op([H|T], T, Token) :-
+    member(H, ['+', '-', '*', '/', '=', '?', ':', ';', ',', '.', '(', ')', '{', '}', '<', '>']),
     atom_chars(Token, [H]).
 
-% Assignment token
-assignment_token([H|T], RestT, Token) :-
-    valid_identifier_start(H),
-    consume_identifier_chars([H|T], IdChars, RestT1),
-    RestT1 = ['=', ';'|RestT],  % Ensure assignment ends with '=' and requires ';'
-    atom_chars(Identifier, IdChars),
-    atom_concat(Identifier, ' = ', Temp),
-    atom_concat(Temp, ';', Token).
+string_literal(['"'|T], Remaining, String) :-
+    extract_string_content(T, Chars, Remaining),
+    atom_chars(String, ['"'|Chars]).
 
-% Numeric token
-number_token([H|T], RestT, Number) :-
+extract_string_content(['"'|T], ['"'|[]], T).
+extract_string_content([H|T], [H|Chars], Remaining) :-
+    extract_string_content(T, Chars, Remaining).
+
+numeric_token([H|T], Remaining, Number) :-
     char_type(H, digit),
-    consume_digits([H|T], Digits, RestT),
-    atom_chars(AtomDigits, Digits),
-    atom_number(AtomDigits, Number).
+    collect_digits([H|T], Digits, Remaining),
+    atom_chars(Atom, Digits),
+    atom_number(Atom, Number).
 
-% String literals including quotes
-string_token(['"'|T], RestT, Token) :-
-    string_chars_token(T, Chars, RestT),
-    atom_concat('"', Chars, Temp),
-    atom_concat(Temp, '"', Token).
+keyword_or_id([H|T], Remaining, Token) :-
+    valid_id_start(H),
+    collect_id_chars([H|T], Chars, Remaining),
+    atom_chars(Token, Chars).
 
-% Helper predicate for characters until the closing quote
-string_chars_token(['"'|T], '', T).
-string_chars_token([H|T], [H|TailChars], RestT) :-
-    string_chars_token(T, TailChars, RestT).
-
-% Identifiers or keywords
-identifier_or_keyword_token([H|T], RestT, Identifier) :-
-    valid_identifier_start(H),
-    consume_identifier_chars([H|T], IdChars, RestT),
-    atom_chars(Identifier, IdChars).
-
-% Helper predicate for digits
-consume_digits([H|T], [H|RestDigits], RestT) :-
+collect_digits([H|T], [H|Rest], Remaining) :-
     char_type(H, digit),
-    consume_digits(T, RestDigits, RestT).
-consume_digits(T, [], T).
+    collect_digits(T, Rest, Remaining).
+collect_digits(T, [], T).
 
-% Helper predicate for identifiers
-consume_identifier_chars([H|T], [H|RestIdChars], RestT) :-
-    valid_identifier_char(H),
-    consume_identifier_chars(T, RestIdChars, RestT).
-consume_identifier_chars(T, [], T).
+collect_id_chars([H|T], [H|Rest], Remaining) :-
+    valid_id_char(H),
+    collect_id_chars(T, Rest, Remaining).
+collect_id_chars(T, [], T).
 
-% Identifier validation
-valid_identifier_start(H) :-
-    \+ char_type(H, space),
-    \+ member(H, ['+', '-', '*', '/', '=', '?', ';', ',', '.', '"', '(', ')', '{', '}']),
-    ( char_type(H, alpha) ; H == '_' ).  % Allow starting with an underscore
-
-% Valid characters for identifiers: alphanumeric and underscore.
-valid_identifier_char(H) :-
-    char_type(H, alnum) ; H == '_'.
-
-% Check if the next character is non-alphabetic
-next_non_alpha([], []).
-next_non_alpha([H|T], [H|T]) :-
-    \+ char_type(H, alpha).
+valid_id_start(H) :- char_type(H, alpha).
+valid_id_char(H) :- char_type(H, alnum) ; H == '_'
