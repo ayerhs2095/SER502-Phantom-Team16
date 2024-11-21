@@ -1,7 +1,7 @@
 % Author: Deepanjay Nandal
 % Purpose: Transforms input text into structured tokens for parsing
-% Version: 1
-% Date: 1st Nov, 2024
+% Version: 2
+% Date: 21st Nov, 2024
 
 lexer(Input, Tokens) :-
     string_chars(Input, Chars),
