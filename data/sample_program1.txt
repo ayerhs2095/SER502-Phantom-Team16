@@ -1,18 +1,9 @@
-
 {
-	const max = 5;
-	a = 1;
-	while(z>=max){
-		print(z);
-	}
-	b = a * 5;
-	if(b==a){
-		c = (b+a)/max;
-	}else{
-		d = (b-a)/max;
-	}
-	for(i=0;i<5;i=i+1){
-		a = b + 1;
-	}
-	(a==b)?print(a);print(b);
+   a = 1;
+   b = 2;
+   if(a>b){
+      print(a);
+   }else{
+      print(b);
+   }
 }
