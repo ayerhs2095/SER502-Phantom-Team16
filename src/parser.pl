@@ -1,5 +1,4 @@
 :- table command/3, expr/3, term/3, bool_expr/3.
-:- use_rendering(svgtree).
 
 % PARSER
 
