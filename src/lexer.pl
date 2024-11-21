@@ -64,4 +64,4 @@ collect_id_chars([H|T], [H|Rest], Remaining) :-
 collect_id_chars(T, [], T).
 
 valid_id_start(H) :- char_type(H, alpha).
-valid_id_char(H) :- char_type(H, alnum) ; H == '_'
+valid_id_char(H) :- char_type(H, alnum) ; H == '_'.
