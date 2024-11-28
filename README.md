@@ -17,3 +17,6 @@
 - run the following commands:
   - consult('main.pl').
   - run('file location').
+
+# Youtube Video Link
+https://youtu.be/laAnB1uHpX8
