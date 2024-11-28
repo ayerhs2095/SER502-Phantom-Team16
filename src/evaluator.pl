@@ -1,6 +1,11 @@
 :- table expr_eval/4.
 % RUN TIME ENVIRONMENT
 
+%Author:Jean
+%Purpose:Evaluator for the lookup, update
+%Version:1
+%Date:Nov 22,2024
+
 % Environment look up -> lookup(Env,Id,Value).
 lookup([[Id,Value]|_],Id,Value).
 lookup([[H,_]|T],Id,Value):- H\=Id, lookup(T,Id,Value).
@@ -25,6 +30,11 @@ command_eval(X=Expr,Env,NewEnv2):-
     expr_eval(Env,Expr,Value,NewEnv1),
     update(NewEnv1,X,Value,NewEnv2).
 
+%Author:Jean
+%Purpose:Evaluator for the conditional statements
+%Version:1
+%Date:Nov 22,2024
+
 % Condition statement
 command_eval(if(condition(BoolExpr),then(Command1),else(_)), Env, NewEnv2):-
     boolean_expr_eval(BoolExpr,Env,NewEnv1,true),
@@ -32,6 +42,11 @@ command_eval(if(condition(BoolExpr),then(Command1),else(_)), Env, NewEnv2):-
 command_eval(if(condition(BoolExpr),then(_),else(Command2)), Env, NewEnv2):-
     boolean_expr_eval(BoolExpr,Env,NewEnv1,false),
     command_eval(Command2,NewEnv1,NewEnv2).
+
+%Author:Jean
+%Purpose:Evaluator for the iterative statements
+%Version:1
+%Date:Nov 22,2024
 
 % while loop
 command_eval(LoopStatement, Env, NewEnv3):-
