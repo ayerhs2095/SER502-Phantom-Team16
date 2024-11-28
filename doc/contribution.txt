@@ -2,6 +2,7 @@ Jean:
   1. Grammar rules for Phantom
   2. DCG: Boolean , Arithmetic and print statement
   3. Evaluator: lookup, update for Environment, Loop & Conditional Statements
+  4. Sample programs
 Shreya: 
   1. DCG: if and ternary statements
 Reuben: 
