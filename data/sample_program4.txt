@@ -1,0 +1,7 @@
+{
+	max = 5;
+	do{
+		print(max);
+		max = max*2;
+	}while(max<100);
+}
