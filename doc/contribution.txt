@@ -2,10 +2,21 @@ Jean:
   1. Grammar rules for Phantom
   2. DCG: Boolean , Arithmetic and print statement
   3. Evaluator: lookup, update for Environment, Loop & Conditional Statements
-  4. Sample programs
+  4. Created sample programs
+  5. Worked on the Final Presentation
 Shreya: 
   1. DCG: if and ternary statements
+  2. Worked on Lexer
+  3. Evaluator for Boolean Expression
+  4. Integrated the Lexer, Parser and Evaluator
+  5. Worked on Final Presentation
 Reuben: 
   1. DCG: iteration statements(for, while, do while)
+  2. Worked on Lexer
+  3. Integrated the Lexer, Parser and Evaluator
+  4. Created Flow Diagrams
+  5. Worked on Final Presentation
 Deepanjay:
   1. Lexer
+  2. Evaluator for Arthmetic Expression
+  3. Worked on Youtube Video for Phantom
